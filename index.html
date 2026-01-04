@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>氨合成产率计算器 (最终修复版)</title>
+    
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']] // 配置 $ 符号识别
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* 保持原有的所有样式不变 */
+        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f4f6f8; --success: #27ae60; --danger: #e74c3c; }
+        body { font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: #333; padding: 20px; margin: 0; }
+        
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 20px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 1000px) {
+            .main-container { grid-template-columns: 1fr; }
+        }
+
+        .panel { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h2 { color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-top: 0; font-size: 18px; display: flex; align-items: center; justify-content: space-between; }
+        .tag { font-size: 12px; background: #eee; padding: 2px 8px; border-radius: 4px; color: #666; font-weight: normal; }
+
+        table.data-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 14px; }
+        table.data-table th { background: #f8f9fa; color: var(--primary); padding: 10px; border: 1px solid #e1e4e8; font-weight: 600; white-space: nowrap; }
+        table.data-table td { border: 1px solid #e1e4e8; padding: 5px; text-align: center; vertical-align: middle; }
+        
+        .no-right-border { border-right: none !important; }
+        .no-left-border { border-left: none !important; }
+
+        input[type="number"] { width: 90%; padding: 8px; border: 1px solid transparent; text-align: center; border-radius: 4px; transition: 0.2s; background: #fff; }
+        input[type="number"]:focus { border-color: var(--accent); outline: none; background: #f0f8ff; }
+        
+        .params-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; background: #fdfdfd; padding: 15px; border-radius: 8px; border: 1px solid #eee; }
+        .input-wrapper label { display: block; font-size: 12px; color: #666; margin-bottom: 5px; font-weight: 600; }
+        .input-wrapper input { width: 100%; border: 1px solid #ddd; padding: 8px; box-sizing: border-box; text-align: left; }
+        
+        .btn-row { display: flex; gap: 10px; margin-top: 10px; }
+        button { border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; transition: 0.2s; font-weight: 600; }
+        .btn-add { background: #ecf0f1; color: #2c3e50; }
+        .btn-del { background: #fff; color: #c0392b; padding: 4px 8px; font-weight: bold; border: 1px solid #fadbd8; }
+        .btn-del:hover { background: #fadbd8; }
+        .btn-primary { background: var(--accent); color: white; width: 100%; padding: 12px; font-size: 16px; margin-top: 15px; }
+        .btn-success { background: var(--success); color: white; width: 100%; padding: 12px; font-size: 16px; margin-top: 10px; }
+        button:hover { opacity: 0.9; }
+
+        .result-cell { font-weight: bold; color: var(--danger); font-size: 1.1em; }
+        .auto-filled { background-color: #e8f5e9 !important; border-color: #a5d6a7 !important; color: #2e7d32; font-weight: bold; }
+        
+        #fit-status { margin-top: 15px; padding: 10px; background: #e8f5e9; border-radius: 6px; font-size: 13px; color: #2e7d32; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    
+    <div class="panel">
+        <h2>1. 标准曲线拟合 <span class="tag">Standard Curve</span></h2>
+        <p style="font-size:12px; color:#666; margin-bottom:15px;">输入标液浓度与吸光度，计算斜率。</p>
+        
+        <table class="data-table" id="curveTable">
+            <thead>
+                <tr>
+                    <th>浓度 $C$ <br><span style="font-weight:normal; font-size:0.9em">($\mu g/mL$)</span></th>
+                    <th>吸光度 $Abs$</th>
+                    <th style="width:40px"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><input type="number" step="0.01" value="0"></td><td><input type="number" step="0.001" value="0"></td><td></td></tr>
+                <tr><td><input type="number" step="0.01" value="0.1"></td><td><input type="number" step="0.001"></td><td><button class="btn-del" onclick="delRow(this)">×</button></td></tr>
+                <tr><td><input type="number" step="0.01" value="0.2"></td><td><input type="number" step="0.001"></td><td><button class="btn-del" onclick="delRow(this)">×</button></td></tr>
+                <tr><td><input type="number" step="0.01" value="0.4"></td><td><input type="number" step="0.001"></td><td><button class="btn-del" onclick="delRow(this)">×</button></td></tr>
+                <tr><td><input type="number" step="0.01" value="0.8"></td><td><input type="number" step="0.001"></td><td><button class="btn-del" onclick="delRow(this)">×</button></td></tr>
+            </tbody>
+        </table>
+        
+        <div class="btn-row">
+            <button class="btn-add" onclick="addCurveRow()">+ 加一行</button>
+        </div>
+
+        <button class="btn-success" onclick="fitCurve()">⚡ 拟合曲线 & 同步参数</button>
+
+        <div id="fit-status">
+            <div>方程: <span id="eq-display" style="font-family:monospace"></span></div>
+            <div>$R^2$: <span id="r2-display"></span></div>
+        </div>
+
+        <div class="params-grid" style="margin-top:20px; margin-bottom:0;">
+            <div class="input-wrapper">
+                <label>斜率 Slope ($k$)</label>
+                <input type="number" id="slope" placeholder="等待拟合..." step="0.0001">
+            </div>
+            <div class="input-wrapper">
+                <label>截距 Intercept ($b$)</label>
+                <input type="number" id="intercept" placeholder="等待拟合..." value="0" step="0.0001">
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>2. 产率计算 <span class="tag">Calculation</span></h2>
+        
+        <div class="params-grid">
+            <div class="input-wrapper">
+                <label>捕获液体积 $V$ (mL)</label>
+                <input type="number" id="volume" value="30">
+            </div>
+            <div class="input-wrapper">
+                <label>催化剂用量 $m_{cat}$ (mg)</label>
+                <input type="number" id="catalyst" value="160">
+            </div>
+            <div class="input-wrapper">
+                <label>空白吸光度 $A_b$ (Abs)</label>
+                <input type="number" id="blank_abs" value="0">
+            </div>
+        </div>
+
+        <table class="data-table" id="calcTable">
+            <thead>
+                <tr>
+                    <th style="width:25%">采样时间 $t$ <br>(h)</th>
+                    <th style="width:25%">吸光度 $A_w$ <br>(Abs)</th>
+                    <th class="no-right-border">摩尔产率 Output <br>($\mu mol \cdot g^{-1} \cdot h^{-1}$)</th>
+                    <th class="no-left-border" style="width:50px"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="number" step="0.1" value="2"></td>
+                    <td><input type="number" step="0.001"></td>
+                    <td class="result-cell no-right-border">-</td>
+                    <td class="no-left-border"><button class="btn-del" onclick="delRow(this)">×</button></td>
+                </tr>
+                <tr>
+                    <td><input type="number" step="0.1" value="2"></td>
+                    <td><input type="number" step="0.001"></td>
+                    <td class="result-cell no-right-border">-</td>
+                    <td class="no-left-border"><button class="btn-del" onclick="delRow(this)">×</button></td>
+                </tr>
+                <tr>
+                    <td><input type="number" step="0.1" value="2"></td>
+                    <td><input type="number" step="0.001"></td>
+                    <td class="result-cell no-right-border">-</td>
+                    <td class="no-left-border"><button class="btn-del" onclick="delRow(this)">×</button></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="btn-row">
+            <button class="btn-add" onclick="addCalcRow()">+ 加一行数据</button>
+        </div>
+
+        <button class="btn-primary" onclick="calculateAll()">计算所有行产率</button>
+        
+        <p style="font-size:12px; color:#999; margin-top:20px; border-top:1px solid #eee; padding-top:10px;">
+            [cite_start]<strong>参考标准：</strong> GB 17378.4-2007 海洋监测规范 第4部分：海水分析 [cite: 1, 2, 22]<br>
+            <strong>计算公式：</strong> $Rate = \frac{n_{NH_3}}{m_{cat} \times t}$，其中 $t$ 为填写的采样时间 (h)。<br>
+            <strong>说明：</strong> 摩尔产率计算已包含 $N \to NH_3$ 的转换系数。
+        </p>
+    </div>
+</div>
+
+<script>
+    function delRow(btn) {
+        const row = btn.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+    }
+
+    function addCurveRow() {
+        const tbody = document.querySelector('#curveTable tbody');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td><input type="number" step="0.01"></td><td><input type="number" step="0.001"></td><td><button class="btn-del" onclick="delRow(this)">×</button></td>`;
+        tbody.appendChild(tr);
+    }
+
+    function addCalcRow() {
+        const tbody = document.querySelector('#calcTable tbody');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><input type="number" step="0.1" value="2"></td>
+            <td><input type="number" step="0.001"></td>
+            <td class="result-cell no-right-border">-</td>
+            <td class="no-left-border"><button class="btn-del" onclick="delRow(this)">×</button></td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    function fitCurve() {
+        const rows = document.querySelectorAll('#curveTable tbody tr');
+        let xData = [], yData = [];
+
+        rows.forEach(row => {
+            const inputs = row.querySelectorAll('input');
+            const x = parseFloat(inputs[0].value);
+            const y = parseFloat(inputs[1].value);
+            if (!isNaN(x) && !isNaN(y)) {
+                xData.push(x);
+                yData.push(y);
+            }
+        });
+
+        if (xData.length < 2) {
+            alert("请至少输入2组有效数据进行拟合");
+            return;
+        }
+
+        const n = xData.length;
+        let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0, sumYY = 0;
+        for (let i = 0; i < n; i++) {
+            sumX += xData[i];
+            sumY += yData[i];
+            sumXY += xData[i] * yData[i];
+            sumXX += xData[i] * xData[i];
+            sumYY += yData[i] * yData[i];
+        }
+
+        const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+        const intercept = (sumY - slope * sumX) / n;
+        const numerator = (n * sumXY - sumX * sumY);
+        const denominator = Math.sqrt((n * sumXX - sumX * sumX) * (n * sumYY - sumY * sumY));
+        const r2 = Math.pow(numerator / denominator, 2);
+
+        const slopeInput = document.getElementById('slope');
+        const intInput = document.getElementById('intercept');
+        
+        slopeInput.value = slope.toFixed(4);
+        intInput.value = intercept.toFixed(4);
+        slopeInput.classList.add('auto-filled');
+        intInput.classList.add('auto-filled');
+        
+        const statusDiv = document.getElementById('fit-status');
+        statusDiv.style.display = 'block';
+        document.getElementById('eq-display').innerText = `y = ${slope.toFixed(4)}x + (${intercept.toFixed(4)})`;
+        document.getElementById('r2-display').innerText = r2.toFixed(5);
+        
+        if (window.MathJax) window.MathJax.typesetPromise();
+    }
+
+    function calculateAll() {
+        const slope = parseFloat(document.getElementById('slope').value);
+        const intercept = parseFloat(document.getElementById('intercept').value);
+        const vol = parseFloat(document.getElementById('volume').value);
+        const catMg = parseFloat(document.getElementById('catalyst').value);
+        const blankAbs = parseFloat(document.getElementById('blank_abs').value) || 0;
+
+        if (!slope || !vol || !catMg) {
+            alert("请先拟合曲线，并填写体积和催化剂用量！");
+            return;
+        }
+
+        const catG = catMg / 1000;
+        const rows = document.querySelectorAll('#calcTable tbody tr');
+        
+        rows.forEach((row) => {
+            const inputs = row.querySelectorAll('input');
+            const time = parseFloat(inputs[0].value);
+            const abs = parseFloat(inputs[1].value);
+            const resultCell = row.querySelector('.result-cell');
+
+            if (isNaN(time) || isNaN(abs) || time <= 0) {
+                resultCell.innerText = "-";
+                return;
+            }
+
+            let netAbs = abs - blankAbs;
+            let conc = (netAbs - intercept) / slope;
+            if (conc < 0) conc = 0;
+
+            let massN = conc * vol; // μg
+            let molNH3 = massN / 14.007; // μmol
+            let yieldRate = molNH3 / (catG * time);
+
+            resultCell.innerHTML = `${yieldRate.toFixed(2)} <span style="font-size:0.7em; color:#999; font-weight:normal;">μmol·g⁻¹·h⁻¹</span>`;
+        });
+
+        if (window.MathJax) window.MathJax.typesetPromise();
+    }
+</script>
+
+</body>
+</html>
