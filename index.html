@@ -38,28 +38,51 @@
         h2 { color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-top: 0; font-size: 18px; display: flex; align-items: center; justify-content: space-between; }
         .tag { font-size: 12px; background: #eee; padding: 2px 8px; border-radius: 4px; color: #666; font-weight: normal; }
 
-        /* 表格样式 */
+        /* --- 表格样式 --- */
         table.data-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 14px; }
         table.data-table th { background: #f8f9fa; color: var(--primary); padding: 10px; border: 1px solid #e1e4e8; font-weight: 600; white-space: nowrap; }
         table.data-table td { border: 1px solid #e1e4e8; padding: 5px; text-align: center; vertical-align: middle; }
         
-        /* 去除列间竖线 */
+        /* 序号列样式 */
+        .index-cell { background-color: #f9f9f9; color: #888; font-weight: bold; width: 40px; }
+
+        /* 特殊边框处理：移除删除按钮前的竖线 */
         .no-right-border { border-right: none !important; }
         .no-left-border { border-left: none !important; }
 
-        input[type="number"] { width: 90%; padding: 8px; border: 1px solid transparent; text-align: center; border-radius: 4px; transition: 0.2s; background: #fff; }
+        /* --- 输入框样式 (移除上下调整箭头) --- */
+        input[type="number"] { 
+            width: 90%; 
+            padding: 8px; 
+            border: 1px solid transparent; 
+            text-align: center; 
+            border-radius: 4px; 
+            transition: 0.2s; 
+            background: #fff; 
+            
+            /* Firefox */
+            -moz-appearance: textfield; 
+        }
+        /* Chrome, Safari, Edge, Opera */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
         input[type="number"]:focus { border-color: var(--accent); outline: none; background: #f0f8ff; }
         
+        /* 参数区 */
         .params-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; background: #fdfdfd; padding: 15px; border-radius: 8px; border: 1px solid #eee; }
         .input-wrapper label { display: block; font-size: 12px; color: #666; margin-bottom: 5px; font-weight: 600; }
         .input-wrapper input { width: 100%; border: 1px solid #ddd; padding: 8px; box-sizing: border-box; text-align: left; }
         
+        /* 按钮 */
         .btn-row { display: flex; gap: 10px; margin-top: 10px; }
         button { border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; transition: 0.2s; font-weight: 600; }
         .btn-add { background: #ecf0f1; color: #2c3e50; }
         .btn-del { background: #fff; color: #c0392b; padding: 4px 8px; font-weight: bold; border: 1px solid #fadbd8; }
         .btn-del:hover { background: #fadbd8; }
-        .btn-primary { background: var(--accent); color: white; width: 100%; padding: 12px; font-size: 16px; margin-top: 15px; }
         .btn-success { background: var(--success); color: white; width: 100%; padding: 12px; font-size: 16px; margin-top: 10px; }
         button:hover { opacity: 0.9; }
 
@@ -82,15 +105,15 @@
                 <tr>
                     <th>浓度 $C$ <br><span style="font-weight:normal; font-size:0.9em">($\mu g/mL$)</span></th>
                     <th>吸光度 $Abs$</th>
-                    <th style="width:40px"></th>
+                    <th class="no-left-border" style="width:40px"></th>
                 </tr>
             </thead>
             <tbody>
-                <tr><td><input type="number" step="0.01" value="0"></td><td><input type="number" step="0.001" value="0"></td><td></td></tr>
-                <tr><td><input type="number" step="0.01" value="0.1"></td><td><input type="number" step="0.001"></td><td><button class="btn-del" onclick="delRow(this)">×</button></td></tr>
-                <tr><td><input type="number" step="0.01" value="0.2"></td><td><input type="number" step="0.001"></td><td><button class="btn-del" onclick="delRow(this)">×</button></td></tr>
-                <tr><td><input type="number" step="0.01" value="0.4"></td><td><input type="number" step="0.001"></td><td><button class="btn-del" onclick="delRow(this)">×</button></td></tr>
-                <tr><td><input type="number" step="0.01" value="0.8"></td><td><input type="number" step="0.001"></td><td><button class="btn-del" onclick="delRow(this)">×</button></td></tr>
+                <tr><td><input type="number" step="0.01" value="0"></td><td class="no-right-border"><input type="number" step="0.001" value="0"></td><td class="no-left-border"></td></tr>
+                <tr><td><input type="number" step="0.01" value="0.1"></td><td class="no-right-border"><input type="number" step="0.001"></td><td class="no-left-border"><button class="btn-del" onclick="delRow(this, 'curve')">×</button></td></tr>
+                <tr><td><input type="number" step="0.01" value="0.2"></td><td class="no-right-border"><input type="number" step="0.001"></td><td class="no-left-border"><button class="btn-del" onclick="delRow(this, 'curve')">×</button></td></tr>
+                <tr><td><input type="number" step="0.01" value="0.4"></td><td class="no-right-border"><input type="number" step="0.001"></td><td class="no-left-border"><button class="btn-del" onclick="delRow(this, 'curve')">×</button></td></tr>
+                <tr><td><input type="number" step="0.01" value="0.8"></td><td class="no-right-border"><input type="number" step="0.001"></td><td class="no-left-border"><button class="btn-del" onclick="delRow(this, 'curve')">×</button></td></tr>
             </tbody>
         </table>
         
@@ -108,11 +131,11 @@
         <div class="params-grid" style="margin-top:20px; margin-bottom:0;">
             <div class="input-wrapper">
                 <label>斜率 Slope ($k$)</label>
-                <input type="number" id="slope" placeholder="等待拟合..." step="0.0001">
+                <input type="number" id="slope" placeholder="等待拟合..." step="0.0001" oninput="calculateAll()">
             </div>
             <div class="input-wrapper">
                 <label>截距 Intercept ($b$)</label>
-                <input type="number" id="intercept" placeholder="等待拟合..." value="0" step="0.0001">
+                <input type="number" id="intercept" placeholder="等待拟合..." value="0" step="0.0001" oninput="calculateAll()">
             </div>
         </div>
     </div>
@@ -123,45 +146,35 @@
         <div class="params-grid">
             <div class="input-wrapper">
                 <label>捕获液体积 $V$ (mL)</label>
-                <input type="number" id="volume" value="30">
+                <input type="number" id="volume" value="30" oninput="calculateAll()">
             </div>
             <div class="input-wrapper">
                 <label>催化剂用量 $m_{cat}$ (mg)</label>
-                <input type="number" id="catalyst" value="160">
+                <input type="number" id="catalyst" value="160" oninput="calculateAll()">
             </div>
             <div class="input-wrapper">
                 <label>空白吸光度 $A_b$ (Abs)</label>
-                <input type="number" id="blank_abs" value="0">
+                <input type="number" id="blank_abs" value="0" oninput="calculateAll()">
             </div>
         </div>
 
         <table class="data-table" id="calcTable">
             <thead>
                 <tr>
+                    <th style="width:50px">序号</th>
                     <th style="width:25%">采样时间 $t$ <br>(h)</th>
                     <th style="width:25%">吸光度 $A_w$ <br>(Abs)</th>
-                    <th class="no-right-border">摩尔产率 Output <br>($\mu mol \cdot g^{-1} \cdot h^{-1}$)</th>
+                    <th class="no-right-border">摩尔产率 $y$ <br>($\mu mol \cdot g^{-1} \cdot h^{-1}$)</th>
                     <th class="no-left-border" style="width:50px"></th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td><input type="number" step="0.1" value="2"></td>
-                    <td><input type="number" step="0.001"></td>
+                    <td class="index-cell">1</td>
+                    <td><input type="number" step="0.1" value="2" oninput="calculateAll()"></td>
+                    <td><input type="number" step="0.001" oninput="calculateAll()"></td>
                     <td class="result-cell no-right-border">-</td>
-                    <td class="no-left-border"><button class="btn-del" onclick="delRow(this)">×</button></td>
-                </tr>
-                <tr>
-                    <td><input type="number" step="0.1" value="2"></td>
-                    <td><input type="number" step="0.001"></td>
-                    <td class="result-cell no-right-border">-</td>
-                    <td class="no-left-border"><button class="btn-del" onclick="delRow(this)">×</button></td>
-                </tr>
-                <tr>
-                    <td><input type="number" step="0.1" value="2"></td>
-                    <td><input type="number" step="0.001"></td>
-                    <td class="result-cell no-right-border">-</td>
-                    <td class="no-left-border"><button class="btn-del" onclick="delRow(this)">×</button></td>
+                    <td class="no-left-border"><button class="btn-del" onclick="delRow(this, 'calc')">×</button></td>
                 </tr>
             </tbody>
         </table>
@@ -169,40 +182,63 @@
         <div class="btn-row">
             <button class="btn-add" onclick="addCalcRow()">+ 加一行数据</button>
         </div>
-
-        <button class="btn-primary" onclick="calculateAll()">计算所有行产率</button>
         
         <p style="font-size:12px; color:#999; margin-top:20px; border-top:1px solid #eee; padding-top:10px;">
             <strong>参考标准：</strong> GB 17378.4-2007 海洋监测规范 第4部分：海水分析<br>
-            <strong>计算公式：</strong> $Rate = \frac{n_{NH_3}}{m_{cat} \times t}$，其中 $t$ 为填写的采样间隔时间 (h)。<br>
+            <strong>计算公式：</strong> $Rate = \frac{n_{NH_3}}{m_{cat} \times t}$，其中 $t$ 为填写的采样时间 (h)
         </p>
     </div>
 </div>
 
 <script>
-    function delRow(btn) {
+    // --- 表格操作 ---
+    
+    // 更新序号
+    function reindexRows() {
+        const rows = document.querySelectorAll('#calcTable tbody tr');
+        rows.forEach((row, index) => {
+            row.querySelector('.index-cell').innerText = index + 1;
+        });
+    }
+
+    function delRow(btn, type) {
         const row = btn.parentNode.parentNode;
         row.parentNode.removeChild(row);
+        
+        if (type === 'calc') {
+            reindexRows();
+            calculateAll();
+        }
     }
 
     function addCurveRow() {
         const tbody = document.querySelector('#curveTable tbody');
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td><input type="number" step="0.01"></td><td><input type="number" step="0.001"></td><td><button class="btn-del" onclick="delRow(this)">×</button></td>`;
+        // 吸光度列去除右边框，按钮列去除左边框
+        tr.innerHTML = `
+            <td><input type="number" step="0.01"></td>
+            <td class="no-right-border"><input type="number" step="0.001"></td>
+            <td class="no-left-border"><button class="btn-del" onclick="delRow(this, 'curve')">×</button></td>
+        `;
         tbody.appendChild(tr);
     }
 
     function addCalcRow() {
         const tbody = document.querySelector('#calcTable tbody');
         const tr = document.createElement('tr');
+        // 产率列去除右边框，按钮列去除左边框
         tr.innerHTML = `
-            <td><input type="number" step="0.1" value="2"></td>
-            <td><input type="number" step="0.001"></td>
+            <td class="index-cell"></td>
+            <td><input type="number" step="0.1" value="2" oninput="calculateAll()"></td>
+            <td><input type="number" step="0.001" oninput="calculateAll()"></td>
             <td class="result-cell no-right-border">-</td>
-            <td class="no-left-border"><button class="btn-del" onclick="delRow(this)">×</button></td>
+            <td class="no-left-border"><button class="btn-del" onclick="delRow(this, 'calc')">×</button></td>
         `;
         tbody.appendChild(tr);
+        reindexRows();
     }
+
+    // --- 核心逻辑 ---
 
     function fitCurve() {
         const rows = document.querySelectorAll('#curveTable tbody tr');
@@ -253,6 +289,7 @@
         document.getElementById('r2-display').innerText = r2.toFixed(5);
         
         if (window.MathJax) window.MathJax.typesetPromise();
+        calculateAll();
     }
 
     function calculateAll() {
@@ -263,7 +300,6 @@
         const blankAbs = parseFloat(document.getElementById('blank_abs').value) || 0;
 
         if (!slope || !vol || !catMg) {
-            alert("请先拟合曲线，并填写体积和催化剂用量！");
             return;
         }
 
@@ -289,11 +325,8 @@
             let molNH3 = massN / 14.007; // μmol
             let yieldRate = molNH3 / (catG * time);
 
-            
-            resultCell.innerHTML = `${yieldRate.toFixed(3)} <span style="font-size:0.7em; color:#999; font-weight:normal;">μmol·g⁻¹·h⁻¹</span>`;
+            resultCell.innerText = yieldRate.toFixed(3);
         });
-
-        if (window.MathJax) window.MathJax.typesetPromise();
     }
 </script>
 
