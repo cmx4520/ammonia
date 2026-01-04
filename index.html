@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>氨合成产率计算器</title>
+    <title>靛酚蓝法氨合成产率计算器</title>
     
     <script>
         window.MathJax = {
             tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']] // 配置 $ 符号识别
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
             },
             svg: {
                 fontCache: 'global'
@@ -18,7 +18,6 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
-        /* 保持原有的所有样式不变 */
         :root { --primary: #2c3e50; --accent: #3498db; --bg: #f4f6f8; --success: #27ae60; --danger: #e74c3c; }
         body { font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: #333; padding: 20px; margin: 0; }
         
@@ -35,13 +34,16 @@
         }
 
         .panel { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        
         h2 { color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-top: 0; font-size: 18px; display: flex; align-items: center; justify-content: space-between; }
         .tag { font-size: 12px; background: #eee; padding: 2px 8px; border-radius: 4px; color: #666; font-weight: normal; }
 
+        /* 表格样式 */
         table.data-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 14px; }
         table.data-table th { background: #f8f9fa; color: var(--primary); padding: 10px; border: 1px solid #e1e4e8; font-weight: 600; white-space: nowrap; }
         table.data-table td { border: 1px solid #e1e4e8; padding: 5px; text-align: center; vertical-align: middle; }
         
+        /* 去除列间竖线 */
         .no-right-border { border-right: none !important; }
         .no-left-border { border-left: none !important; }
 
@@ -171,9 +173,8 @@
         <button class="btn-primary" onclick="calculateAll()">计算所有行产率</button>
         
         <p style="font-size:12px; color:#999; margin-top:20px; border-top:1px solid #eee; padding-top:10px;">
-            [cite_start]<strong>参考标准：</strong> GB 17378.4-2007 海洋监测规范 第4部分：海水分析 [cite: 1, 2, 22]<br>
-            <strong>计算公式：</strong> $Rate = \frac{n_{NH_3}}{m_{cat} \times t}$，其中 $t$ 为填写的采样时间 (h)。<br>
-            <strong>说明：</strong> 摩尔产率计算已包含 $N \to NH_3$ 的转换系数。
+            <strong>参考标准：</strong> GB 17378.4-2007 海洋监测规范 第4部分：海水分析<br>
+            <strong>计算公式：</strong> $Rate = \frac{n_{NH_3}}{m_{cat} \times t}$，其中 $t$ 为填写的采样间隔时间 (h)。<br>
         </p>
     </div>
 </div>
@@ -288,7 +289,8 @@
             let molNH3 = massN / 14.007; // μmol
             let yieldRate = molNH3 / (catG * time);
 
-            resultCell.innerHTML = `${yieldRate.toFixed(2)} <span style="font-size:0.7em; color:#999; font-weight:normal;">μmol·g⁻¹·h⁻¹</span>`;
+            
+            resultCell.innerHTML = `${yieldRate.toFixed(3)} <span style="font-size:0.7em; color:#999; font-weight:normal;">μmol·g⁻¹·h⁻¹</span>`;
         });
 
         if (window.MathJax) window.MathJax.typesetPromise();
@@ -296,5 +298,4 @@
 </script>
 
 </body>
-
 </html>
