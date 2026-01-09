@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>靛酚蓝法氨合成产率计算器</title>
+    <title>氨合成产率计算器 (配液指南版)</title>
     
     <script>
         window.MathJax = {
@@ -21,12 +21,14 @@
         :root { --primary: #2c3e50; --accent: #3498db; --bg: #f4f6f8; --success: #27ae60; --danger: #e74c3c; }
         body { font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: #333; padding: 20px; margin: 0; }
         
+        /* --- 布局容器 --- */
         .main-container {
             display: grid;
             grid-template-columns: 1fr 1.3fr;
             gap: 20px;
             max-width: 1300px;
             margin: 0 auto;
+            margin-top: 40px; /* 给顶部按钮留出空间 */
         }
 
         @media (max-width: 1000px) {
@@ -38,19 +40,78 @@
         h2 { color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-top: 0; font-size: 18px; display: flex; align-items: center; justify-content: space-between; }
         .tag { font-size: 12px; background: #eee; padding: 2px 8px; border-radius: 4px; color: #666; font-weight: normal; }
 
+        /* --- 左上角 配制指南按钮 --- */
+        .guide-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        .guide-btn:hover {
+            background-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+
+        /* --- 模态框 (Modal) 样式 --- */
+        .modal-overlay {
+            display: none; /* 默认隐藏 */
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .close-modal {
+            position: absolute;
+            top: 15px; right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.2s;
+        }
+        .close-modal:hover { color: var(--danger); }
+        
+        /* 指南文本样式 */
+        .guide-section h3 { color: var(--accent); border-left: 4px solid var(--primary); padding-left: 10px; margin-top: 20px; }
+        .guide-section ul { padding-left: 20px; }
+        .guide-section li { margin-bottom: 8px; line-height: 1.6; }
+        .chem-formula { font-family: "Georgia", serif; background: #f0f4f8; padding: 2px 5px; border-radius: 4px; }
+
         /* --- 表格样式 --- */
         table.data-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 14px; }
         table.data-table th { background: #f8f9fa; color: var(--primary); padding: 10px; border: 1px solid #e1e4e8; font-weight: 600; white-space: nowrap; }
         table.data-table td { border: 1px solid #e1e4e8; padding: 5px; text-align: center; vertical-align: middle; }
         
-        /* 序号列样式 */
         .index-cell { background-color: #f9f9f9; color: #888; font-weight: bold; width: 40px; }
-
-        /* 特殊边框处理：移除删除按钮前的竖线 */
         .no-right-border { border-right: none !important; }
         .no-left-border { border-left: none !important; }
 
-        /* --- 输入框样式 (移除上下调整箭头) --- */
+        /* --- 输入框样式 --- */
         input[type="number"] { 
             width: 90%; 
             padding: 8px; 
@@ -59,17 +120,10 @@
             border-radius: 4px; 
             transition: 0.2s; 
             background: #fff; 
-            
-            /* Firefox */
             -moz-appearance: textfield; 
         }
-        /* Chrome, Safari, Edge, Opera */
         input[type="number"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
+        input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"]:focus { border-color: var(--accent); outline: none; background: #f0f8ff; }
         
         /* 参数区 */
@@ -93,6 +147,39 @@
     </style>
 </head>
 <body>
+
+<button class="guide-btn" onclick="openModal()">🧪 靛酚蓝溶液配置</button>
+
+<div id="guideModal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-content">
+        <span class="close-modal" onclick="document.getElementById('guideModal').style.display='none'">&times;</span>
+        <h2 style="border-bottom: 1px solid #eee; padding-bottom: 10px;">靛酚蓝法溶液配置指南</h2>
+        
+        <div class="guide-section">
+            <h3>1. 试剂与溶液 (Reagents)</h3>
+            <ul>
+                <li><strong>氨标准溶液 (Stock Solution)</strong>：<br>称取 0.03537 g 氯化铵 ($NH_4Cl$)，溶于去离子水并定容至 100 mL。</li>
+                
+                <li><strong>硫酸捕获液 (Absorbent)</strong>：<br>使用实验室浓硫酸配制。根据催化剂活性，浓度可调节为 0.6、1、3、6 或 8 mmol/L。</li>
+                
+                <li><strong>氢氧化钠溶液</strong>：<br>浓度为 0.5 mol/L。</li>
+                
+                <li><strong>显色剂 A (苯酚溶液)</strong>：<br>称取 3.8 g 苯酚 + 40 mg 亚硝酰铁氰化钠，溶解并稀释至 100 mL。置于棕色瓶中避光保存。</li>
+                
+                <li><strong>显色剂 B (柠檬酸钠溶液)</strong>：<br>称取 48 g 柠檬酸钠溶于 100 mL 水，加入 4 mL 0.5 mol/L 氢氧化钠溶液。煮沸至体积 < 100 mL 以除氨，冷却后用水稀释回 100 mL。</li>
+                
+                <li><strong>氧化液 (次氯酸钠溶液)</strong>：<br>取 25 mL 市售次氯酸钠溶液 + 25 mL 0.5 mol/L 氢氧化钠溶液混合均匀。</li>
+            </ul>
+
+            <h3>2. 测定步骤 (Procedure)</h3>
+            <ul>
+                <li><strong>标准曲线绘制</strong>：<br>在硫酸捕获液中分别加入 0、90、180、270、360 $\mu L$ 氨标准溶液。</li>
+                <li><strong>显色反应</strong>：<br>取 30 mL 待测液（或标准液） + 1 mL 显色剂 B + 1 mL 显色剂 A + 1 mL 氧化液。</li>
+                <li><strong>测试</strong>：<br>混合均匀后避光静置（通常1-2小时），测试紫外吸光度。</li>
+            </ul>
+        </div>
+    </div>
+</div>
 
 <div class="main-container">
     
@@ -191,9 +278,20 @@
 </div>
 
 <script>
+    // --- 弹窗控制 ---
+    function openModal() {
+        document.getElementById('guideModal').style.display = 'flex';
+        if (window.MathJax) window.MathJax.typesetPromise(); // 确保弹窗内的公式渲染
+    }
+
+    function closeModal(e) {
+        if (e.target.id === 'guideModal') {
+            document.getElementById('guideModal').style.display = 'none';
+        }
+    }
+
     // --- 表格操作 ---
     
-    // 更新序号
     function reindexRows() {
         const rows = document.querySelectorAll('#calcTable tbody tr');
         rows.forEach((row, index) => {
@@ -204,7 +302,6 @@
     function delRow(btn, type) {
         const row = btn.parentNode.parentNode;
         row.parentNode.removeChild(row);
-        
         if (type === 'calc') {
             reindexRows();
             calculateAll();
@@ -214,7 +311,6 @@
     function addCurveRow() {
         const tbody = document.querySelector('#curveTable tbody');
         const tr = document.createElement('tr');
-        // 吸光度列去除右边框，按钮列去除左边框
         tr.innerHTML = `
             <td><input type="number" step="0.01"></td>
             <td class="no-right-border"><input type="number" step="0.001"></td>
@@ -226,7 +322,6 @@
     function addCalcRow() {
         const tbody = document.querySelector('#calcTable tbody');
         const tr = document.createElement('tr');
-        // 产率列去除右边框，按钮列去除左边框
         tr.innerHTML = `
             <td class="index-cell"></td>
             <td><input type="number" step="0.1" value="2" oninput="calculateAll()"></td>
