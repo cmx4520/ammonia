@@ -3,9 +3,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 ![Language](https://img.shields.io/badge/language-HTML%2FJS-orange)
 
-这是一个基于 Web 的轻量级计算工具，专门用于**电催化氮还原 (NRR)** 实验中氨产率的计算。
+本工具为一款基于 Web 的轻量级计算程序，旨在替代繁琐的靛酚蓝法测定氨合成速率的 Excel 处理流程，帮助科研人员快速获取实验数据。
 
-该工具基于 **GB 17378.4-2007 (靛酚蓝分光光度法)** 原理，集成了标准曲线拟合与摩尔产率批量计算功能，旨在替代繁琐的 Excel 处理流程，帮助科研人员快速获取实验数据。
+该工具基于 **GB 17378.4-2007 海洋监测规范 第4部分：海水分析**
 
 ## ✨ 主要功能 (Features)
 
@@ -26,9 +26,6 @@
     * 纯前端实现 (Vanilla JS)，无后端服务器。
     * 所有数据仅在本地浏览器运行，不上传任何云端，确保实验数据安全。
 
-## 🛠️ 计算原理 (Methodology)
-
-[cite_start]本工具计算逻辑严格遵循 **GB 17378.4-2007 海洋监测规范 第4部分：海水分析** [cite: 1]。
 
 ### 1. 浓度计算
 根据朗伯-比尔定律 (Lambert-Beer Law) 及标准曲线：
@@ -67,12 +64,3 @@ $$\text{Yield Rate} = \frac{n_{NH_3}}{m_{cat} \times t}$$
 
 ## 🖥️ 使用截图 (Screenshots)
 
-*(此处建议您上传一张工具运行时的截图，并将链接替换下方的占位符)*
-
-![App Screenshot](./screenshot.png)
-
-## 📂 文件结构
-```text
-.
-├── index.html      # 包含所有逻辑、样式和结构的单文件
-└── README.md       # 项目说明文档
