@@ -47,20 +47,17 @@ $$\text{Yield Rate} = \frac{n_{NH_3}}{m_{cat} \times t}$$
 其中：
 * $m_{cat}$：催化剂用量 ($g$)
 * $t$：采样反应时间 ($h$)
-* 最终单位：$\mu mol \cdot g^{-1} \cdot h^{-1}$
+* 最终单位：μmol·g⁻¹·h⁻¹
 
 ## 🚀 快速开始 (Quick Start)
 
 ### 方法 1：直接运行
-1.  下载本项目中的 `index.html` 文件（或您保存的 html 文件名）。
-2.  双击文件，使用 Chrome、Edge 或 Firefox 浏览器打开即可使用。
-3.  **注意**：请保持联网状态，因为公式渲染依赖 MathJax CDN。
+1.  下载本项目中的 `index.html` 文件
+2.  双击文件，使用 Chrome、Edge 或 Firefox 浏览器打开即可使用
 
-### 方法 2：部署到 GitHub Pages
-1.  Fork 本仓库。
-2.  进入仓库 `Settings` -> `Pages`。
-3.  在 `Branch` 处选择 `main` (或 `master`) 并保存。
-4.  几分钟后，您将获得一个在线链接，可在任何设备上访问。
+### 方法 2：访问在线网页
+https://cmx4520.github.io/ammonia/
 
 ## 🖥️ 使用截图 (Screenshots)
+<img width="2285" height="1048" alt="截图" src="https://github.com/user-attachments/assets/5175a387-0539-41b1-aa7f-0ae2683c46a4" />
 
